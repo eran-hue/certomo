@@ -1,0 +1,28 @@
+{
+  "name": "Milezero Template Dev",
+  "dockerFile": "Dockerfile",
+  "forwardPorts": [
+    5432,
+    15672,
+    5000,
+    5001,
+    5002,
+    5003,
+    5004,
+    5005,
+    5006
+  ],
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-dotnettools.csharp",
+        "ms-azuretools.vscode-docker",
+        "adpyke.vscode-sql-formatter",
+        "humao.rest-client"
+      ]
+    }
+  }
+}
