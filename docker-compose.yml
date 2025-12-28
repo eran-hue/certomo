@@ -1,4 +1,4 @@
-name: milezero-template
+name: certomo-template
 services:
   rabbitmq:
     image: rabbitmq:3-management
@@ -30,7 +30,7 @@ services:
       timeout: 5s
       retries: 5
 
-  api-gateway:
+  openbankapi:
     build:
       context: .
       dockerfile: src/ApiGateway/Dockerfile
