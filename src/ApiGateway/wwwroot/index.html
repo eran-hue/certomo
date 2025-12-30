@@ -3,259 +3,486 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Certomo Data Dashboard</title>
+    <title>Certomo Financial Dashboard</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
             margin: 0;
-            padding: 20px;
-            background-color: #f4f4f9;
-            color: #333;
+            padding: 0;
+            line-height: 1.6;
         }
 
+        /* Layout */
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
+            padding: 2rem;
         }
 
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 30px;
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: var(--card-bg);
+            padding: 1.5rem 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
-        .section {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        .header-left h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        h2 {
-            margin-top: 0;
-            color: #2980b9;
-            border-bottom: 2px solid #ecf0f1;
-            padding-bottom: 10px;
+        .header-right {
+            text-align: right;
+            font-size: 0.9rem;
+            color: var(--text-muted);
         }
 
-        /* Accounts Grid */
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .kpi-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .kpi-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* Accounts Section */
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
         .accounts-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
         }
 
         .account-card {
-            background: #fff;
-            border: 1px solid #e1e1e1;
-            border-radius: 8px;
-            padding: 15px;
-            transition: transform 0.2s;
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
         }
 
         .account-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
 
         .account-header {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
         }
 
-        .bank-name {
-            font-weight: bold;
-            color: #7f8c8d;
-            font-size: 0.9em;
+        .bank-logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: contain;
+            background: #f8fafc;
+            padding: 4px;
+            border: 1px solid var(--border-color);
         }
 
-        .account-balance {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #27ae60;
+        .bank-info h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
         }
 
-        .account-balance.negative {
-            color: #c0392b;
+        .bank-info span {
+            font-size: 0.85rem;
+            color: var(--text-muted);
         }
 
         .account-details {
-            font-size: 0.9em;
-            color: #555;
-            margin-top: 10px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
         }
 
+        .detail-item label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-item .value {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .account-balance {
+            margin-top: 1rem;
+            text-align: right;
+        }
+
+        .balance-amount {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        .positive { color: var(--success-color); }
+        .negative { color: var(--danger-color); }
+
+        .status-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-active { background: #dcfce7; color: #166534; }
+        .status-inactive { background: #fee2e2; color: #991b1b; }
+
         /* Transactions Table */
+        .table-container {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
+            font-size: 0.95rem;
         }
 
-        th, td {
-            text-align: left;
-            padding: 12px;
-            border-bottom: 1px solid #eee;
+        thead {
+            background: #f8fafc;
+            border-bottom: 1px solid var(--border-color);
         }
 
         th {
-            background-color: #f8f9fa;
-            color: #2c3e50;
+            text-align: left;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            font-size: 0.85rem;
+            text-transform: uppercase;
         }
 
-        tr:hover {
-            background-color: #f5f5f5;
+        td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
         }
 
-        .amount-positive {
-            color: #27ae60;
-            font-weight: bold;
-        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background-color: #f8fafc; }
 
-        .amount-negative {
-            color: #c0392b;
-            font-weight: bold;
-        }
+        .tx-desc { font-weight: 500; }
+        .tx-meta { display: block; font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
 
+        /* Loading & Error */
         #loading {
             text-align: center;
-            font-size: 1.2em;
-            color: #666;
-            padding: 50px;
+            padding: 4rem;
+            color: var(--text-muted);
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
         }
 
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
         #error {
-            color: #c0392b;
-            text-align: center;
             display: none;
-            padding: 20px;
-            background: #fdeaea;
-            border-radius: 8px;
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            border: 1px solid #fecaca;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .accounts-grid { grid-template-columns: 1fr; }
+            .header-left h1 { font-size: 1.25rem; }
+            th, td { padding: 0.75rem 1rem; }
+            .hide-mobile { display: none; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Certomo Data Dashboard</h1>
 
-        <div id="loading">Loading data from Certomo...</div>
-        <div id="error"></div>
-
-        <div id="dashboard" style="display: none;">
-            <div class="section">
-                <h2>Accounts Summary</h2>
-                <div class="accounts-grid" id="accounts-container">
-                    <!-- Accounts will be inserted here -->
-                </div>
-            </div>
-
-            <div class="section">
-                <h2>Recent Transactions</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Description</th>
-                            <th>Amount</th>
-                            <th>Currency</th>
-                        </tr>
-                    </thead>
-                    <tbody id="transactions-body">
-                        <!-- Transactions will be inserted here -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
+<div class="container">
+    <div id="loading">
+        <div class="spinner"></div>
+        <p>Connecting to secure banking gateway...</p>
     </div>
 
-    <script>
-        async function fetchData() {
-            try {
-                const response = await fetch('/api/certomo-data');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch data');
-                }
-                const data = await response.json();
-                renderDashboard(data);
-            } catch (error) {
-                document.getElementById('loading').style.display = 'none';
-                const errorDiv = document.getElementById('error');
-                errorDiv.style.display = 'block';
-                errorDiv.textContent = `Error: ${error.message}. Please check if the API Gateway is running.`;
-            }
-        }
+    <div id="error"></div>
 
-        function formatCurrency(amount, currency) {
-            return new Intl.NumberFormat('en-IL', { style: 'currency', currency: currency }).format(amount);
-        }
+    <div id="dashboard" style="display: none;">
+        <header>
+            <div class="header-left">
+                <h1>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    Certomo Financial Overview
+                </h1>
+            </div>
+            <div class="header-right">
+                <div>Data last updated:</div>
+                <strong id="last-update">--</strong>
+            </div>
+        </header>
 
-        function formatDate(dateString) {
-            if (!dateString) return 'N/A';
-            const date = new Date(dateString);
-            return date.toLocaleDateString();
-        }
+        <!-- KPIs -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-title">Total Active Accounts</div>
+                <div class="kpi-value" id="kpi-accounts">0</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Total Net Worth (Est.)</div>
+                <div class="kpi-value positive" id="kpi-net-worth">₪0.00</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Recent Transactions</div>
+                <div class="kpi-value" id="kpi-transactions">0</div>
+            </div>
+        </div>
 
-        function renderDashboard(data) {
+        <!-- Accounts List -->
+        <h2 class="section-title">Your Accounts</h2>
+        <div class="accounts-grid" id="accounts-container">
+            <!-- Dynamic Content -->
+        </div>
+
+        <!-- Transactions List -->
+        <h2 class="section-title">Transaction History</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Description / Entity</th>
+                        <th>Reference</th>
+                        <th class="hide-mobile">Account</th>
+                        <th style="text-align: right;">Amount</th>
+                        <th style="text-align: right;" class="hide-mobile">Balance</th>
+                    </tr>
+                </thead>
+                <tbody id="transactions-body">
+                    <!-- Dynamic Content -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function fetchData() {
+        try {
+            const response = await fetch('/api/certomo-data');
+            if (!response.ok) throw new Error('Failed to fetch data');
+            const data = await response.json();
+            renderDashboard(data);
+        } catch (error) {
             document.getElementById('loading').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'block';
+            const errorDiv = document.getElementById('error');
+            errorDiv.style.display = 'block';
+            errorDiv.textContent = `System Error: ${error.message}. Ensure API Gateway is running.`;
+        }
+    }
 
-            // Render Accounts
-            const accountsContainer = document.getElementById('accounts-container');
-            accountsContainer.innerHTML = '';
+    const formatCurrency = (amount, currency) => {
+        // Handle string amounts from API
+        const num = parseFloat(amount);
+        return new Intl.NumberFormat('en-IL', { style: 'currency', currency: currency || 'ILS' }).format(num);
+    };
 
-            if (data.accountsList) {
-                data.accountsList.forEach(account => {
-                    const card = document.createElement('div');
-                    card.className = 'account-card';
-                    
-                    const isNegative = account.amount < 0;
-                    const balanceClass = isNegative ? 'negative' : '';
+    const formatDate = (dateStr) => {
+        if (!dateStr) return '';
+        return new Date(dateStr).toLocaleDateString('en-GB', {
+            day: '2-digit', month: 'short', year: 'numeric'
+        });
+    };
 
-                    card.innerHTML = `
-                        <div class="account-header">
-                            <span class="bank-name">${account.bank || 'Unknown Bank'}</span>
-                        </div>
-                        <div class="account-balance ${balanceClass}">
-                            ${formatCurrency(account.amount, account.currency)}
-                        </div>
-                        <div class="account-details">
-                            <strong>${account.accountName || 'Unnamed Account'}</strong><br>
-                            <small>${account.accountNo || 'No Number'}</small>
-                        </div>
-                    `;
-                    accountsContainer.appendChild(card);
-                });
-            }
+    function renderDashboard(data) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
 
-            // Render Transactions (Limit to 20 for performance)
-            const transactionsBody = document.getElementById('transactions-body');
-            transactionsBody.innerHTML = '';
+        // 1. Header Info
+        document.getElementById('last-update').textContent = new Date(data.dateTimeOfLastUpdate).toLocaleString();
 
-            if (data.transactionList) {
-                // Sort by date descending if possible, though API might not guarantee order
-                const transactions = data.transactionList.slice(0, 50); 
+        // 2. Process Accounts
+        const accountsContainer = document.getElementById('accounts-container');
+        accountsContainer.innerHTML = '';
+        
+        let totalNetWorthILS = 0;
+        let activeAccountsCount = 0;
+
+        if (data.accountsList) {
+            data.accountsList.forEach(acc => {
+                if (acc.active) activeAccountsCount++;
                 
-                transactions.forEach(tx => {
-                    const row = document.createElement('tr');
-                    const isPositive = tx.amount > 0;
-                    const amountClass = isPositive ? 'amount-positive' : 'amount-negative';
+                // Naive net worth sum (assuming everything is roughly 1:1 for demo if no currency conversion)
+                // In a real app, you'd convert currencies.
+                const amountVal = parseFloat(acc.amount);
+                if (acc.currency === 'ILS') totalNetWorthILS += amountVal;
 
-                    row.innerHTML = `
-                        <td>${formatDate(tx.valueDate)}</td>
-                        <td>${tx.description}</td>
-                        <td class="${amountClass}">${formatCurrency(tx.amount, tx.currency)}</td>
-                        <td>${tx.currency}</td>
-                    `;
-                    transactionsBody.appendChild(row);
-                });
-            }
+                const card = document.createElement('div');
+                card.className = 'account-card';
+                const statusClass = acc.active ? 'status-active' : 'status-inactive';
+                const statusText = acc.active ? 'Active' : 'Inactive';
+                const balanceClass = amountVal >= 0 ? 'positive' : 'negative';
+
+                // Use placeholder if no image
+                const imgUrl = acc.bank_img || 'https://via.placeholder.com/48?text=Bank';
+
+                card.innerHTML = `
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                    <div class="account-header">
+                        <img src="${imgUrl}" alt="${acc.bank}" class="bank-logo" onerror="this.src='https://via.placeholder.com/48?text=Bank'">
+                        <div class="bank-info">
+                            <h3>${acc.bank}</h3>
+                            <span>${acc.entityName || 'Personal Account'}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="account-details">
+                        <div class="detail-item">
+                            <label>Account Number</label>
+                            <div class="value">${acc.account_no}</div>
+                        </div>
+                        <div class="detail-item">
+                            <label>Type</label>
+                            <div class="value">${acc.type}</div>
+                        </div>
+                    </div>
+
+                    <div class="account-balance">
+                        <div class="detail-item"><label>Current Balance</label></div>
+                        <div class="balance-amount ${balanceClass}">
+                            ${formatCurrency(acc.amount, acc.currency)}
+                        </div>
+                    </div>
+                `;
+                accountsContainer.appendChild(card);
+            });
         }
 
-        // Initialize
-        fetchData();
-    </script>
+        // 3. Update KPIs
+        document.getElementById('kpi-accounts').textContent = activeAccountsCount;
+        document.getElementById('kpi-net-worth').textContent = formatCurrency(totalNetWorthILS, 'ILS'); // Showing ILS sum only for demo
+        document.getElementById('kpi-transactions').textContent = data.transactionList ? data.transactionList.length : 0;
+
+        // 4. Process Transactions
+        const txBody = document.getElementById('transactions-body');
+        txBody.innerHTML = '';
+
+        if (data.transactionList) {
+            // Take last 50
+            data.transactionList.slice(0, 50).forEach(tx => {
+                const row = document.createElement('tr');
+                const amountVal = parseFloat(tx.amount);
+                const amountClass = amountVal >= 0 ? 'positive' : 'negative';
+
+                row.innerHTML = `
+                    <td>
+                        <div style="font-weight:500;">${formatDate(tx.valueDate)}</div>
+                    </td>
+                    <td>
+                        <div class="tx-desc">${tx.description}</div>
+                        <span class="tx-meta">${tx.entity || ''}</span>
+                    </td>
+                    <td><span class="tx-meta">${tx.reference || '-'}</span></td>
+                    <td class="hide-mobile">
+                        <div style="font-size:0.9em;">${tx.bank}</div>
+                        <div class="tx-meta">${tx.account_no}</div>
+                    </td>
+                    <td style="text-align: right;" class="${amountClass}">
+                        ${formatCurrency(tx.amount, tx.currency)}
+                    </td>
+                    <td style="text-align: right;" class="hide-mobile">
+                        ${tx.balance ? formatCurrency(tx.balance, tx.currency) : '-'}
+                    </td>
+                `;
+                txBody.appendChild(row);
+            });
+        }
+    }
+
+    // Start
+    fetchData();
+</script>
+
 </body>
 </html>
