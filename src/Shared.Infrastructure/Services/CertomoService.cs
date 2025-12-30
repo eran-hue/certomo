@@ -24,8 +24,34 @@ public class CertomoService : ICertomoService
     {
         try
         {
-            var request = new CertomoAuthRequest(username, password);
-            var response = await _httpClient.PostAsJsonAsync("/authenticate", request, cancellationToken);
+            // API expected payload format is key: "username", "password" (lowercase) - trying this as "Password" failed.
+            var payload = new 
+            {
+                username = username,
+                password = password
+            };
+
+            var request = new HttpRequestMessage(HttpMethod.Post, "/authenticate");
+            request.Content = JsonContent.Create(payload);
+
+             if (!string.IsNullOrEmpty(_options.Secret))
+            {
+                request.Headers.Add("secret", _options.Secret);
+            }
+            else if (!string.IsNullOrEmpty(_options.ClientSecret))
+            {
+                 request.Headers.Add("secret", _options.ClientSecret);
+            }
+            
+            var response = await _httpClient.SendAsync(request, cancellationToken);
+            
+            // Log response if failure for debugging (only in dev/debug)
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
+                _logger.LogError("Certomo Auth Failed: {StatusCode} - {Content}", response.StatusCode, errorContent);
+            }
+
             response.EnsureSuccessStatusCode();
 
             return await response.Content.ReadFromJsonAsync<CertomoAuthResponse>(cancellationToken: cancellationToken) 
@@ -42,8 +68,10 @@ public class CertomoService : ICertomoService
     {
         try
         {
-            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
-            var response = await _httpClient.GetAsync("/bank/getAll", cancellationToken);
+            var request = new HttpRequestMessage(HttpMethod.Get, "/bank/getAll");
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+
+            var response = await _httpClient.SendAsync(request, cancellationToken);
             response.EnsureSuccessStatusCode();
 
             return await response.Content.ReadFromJsonAsync<List<CertomoBank>>(cancellationToken: cancellationToken) 
@@ -60,16 +88,13 @@ public class CertomoService : ICertomoService
     {
         try
         {
-            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+            var request = new HttpRequestMessage(HttpMethod.Get, $"/flow/getBankData?username={Uri.EscapeDataString(username)}");
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
             
             // Adding 'secret' to headers as per documentation for GetBankData
-            if (!_httpClient.DefaultRequestHeaders.Contains("secret"))
-            {
-                _httpClient.DefaultRequestHeaders.Add("secret", secret);
-            }
+            request.Headers.Add("secret", secret);
 
-            // Using query parameter for username as per spec: /flow/getBankData?username=<<username>>
-            var response = await _httpClient.GetAsync($"/flow/getBankData?username={Uri.EscapeDataString(username)}", cancellationToken);
+            var response = await _httpClient.SendAsync(request, cancellationToken);
             response.EnsureSuccessStatusCode();
 
             return await response.Content.ReadFromJsonAsync<CertomoBankDataResponse>(cancellationToken: cancellationToken)
@@ -82,26 +107,27 @@ public class CertomoService : ICertomoService
         }
     }
 
-    public async Task<CertomoIsraelAuthResponse> InitiateIsraelOpenBankingAuthAsync(string accessToken, CertomoIsraelAuthRequest request, CancellationToken cancellationToken = default)
+    public async Task<CertomoIsraelAuthResponse> InitiateIsraelOpenBankingAuthAsync(string accessToken, CertomoIsraelAuthRequest authRequest, CancellationToken cancellationToken = default)
     {
         try
         {
-            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
-            
             // Construct query string manually as per GET request spec
             // /cfoAccessInfo/ilObinitiateAuthUrl
             // URL Parameters: psuId, businessUid, bankId, accountType, tsAndCs, partner, channel
             
             var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
-            query["psuId"] = request.PsuId;
-            if (!string.IsNullOrEmpty(request.BusinessUid)) query["businessUid"] = request.BusinessUid;
-            query["bankId"] = request.BankId.ToString();
-            query["accountType"] = request.AccountType;
-            query["tsAndCs"] = request.TsAndCs.ToString().ToLower(); // API likely expects "true"/"false"
-            query["partner"] = request.Partner;
-            query["channel"] = request.Channel;
+            query["psuId"] = authRequest.PsuId;
+            if (!string.IsNullOrEmpty(authRequest.BusinessUid)) query["businessUid"] = authRequest.BusinessUid;
+            query["bankId"] = authRequest.BankId.ToString();
+            query["accountType"] = authRequest.AccountType;
+            query["tsAndCs"] = authRequest.TsAndCs.ToString().ToLower(); // API likely expects "true"/"false"
+            query["partner"] = authRequest.Partner;
+            query["channel"] = authRequest.Channel;
 
-            var response = await _httpClient.GetAsync($"/cfoAccessInfo/ilObinitiateAuthUrl?{query}", cancellationToken);
+            var request = new HttpRequestMessage(HttpMethod.Get, $"/cfoAccessInfo/ilObinitiateAuthUrl?{query}");
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+
+            var response = await _httpClient.SendAsync(request, cancellationToken);
             response.EnsureSuccessStatusCode();
 
             return await response.Content.ReadFromJsonAsync<CertomoIsraelAuthResponse>(cancellationToken: cancellationToken)

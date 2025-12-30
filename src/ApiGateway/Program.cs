@@ -31,6 +31,9 @@ builder.Services.AddMediatR(cfg =>
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
+// Register Shared Infrastructure
+builder.Services.AddSharedInfrastructure(builder.Configuration);
+
 // Configure MassTransit using Shared Extension
 builder.Services.AddSharedMassTransit(builder.Configuration);
 
@@ -44,6 +47,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles(); // Serve static files (HTML/CSS/JS)
 
 app.UseSerilogRequestLogging();
 
@@ -55,6 +59,35 @@ app.MapPost("/api/signals", async ([FromBody] SignalRequest request, IMediator m
     return Results.Accepted(value: new { SignalId = signalId });
 })
 .WithName("SubmitSignal");
+
+// Endpoint to fetch Certomo Data
+app.MapGet("/api/certomo-data", async (
+    [FromServices] Shared.Application.Abstractions.ICertomoService certomoService, 
+    [FromServices] Microsoft.Extensions.Configuration.IConfiguration configuration) =>
+{
+    try
+    {
+        var username = configuration["Certomo:Username"];
+        var password = configuration["Certomo:Password"];
+        var secret = configuration["Certomo:Secret"];
+
+        if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(secret))
+        {
+            return Results.Problem("Missing Certomo credentials.");
+        }
+
+        var authResponse = await certomoService.AuthenticateAsync(username, password);
+        var bankData = await certomoService.GetBankDataAsync(authResponse.Jwt, username, secret);
+
+        return Results.Ok(bankData);
+    }
+    catch (Exception ex)
+    {
+        Log.Error(ex, "Error fetching Certomo data");
+        return Results.Problem("Failed to fetch data from Certomo.");
+    }
+})
+.WithName("GetCertomoData");
 
 try
 {
