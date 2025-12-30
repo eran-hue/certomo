@@ -8,6 +8,7 @@ using Shared.Infrastructure.Logging;
 using Serilog;
 using Shared.Infrastructure.Extensions;
 using FluentValidation;
+using Scalar.AspNetCore;
 
 SerilogConfiguration.ConfigureLogging("ApiGateway");
 
@@ -44,6 +45,7 @@ app.UseExceptionHandler(); // This must be first
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 app.UseHttpsRedirection();
