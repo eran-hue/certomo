@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certomo Data Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #2980b9;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 10px;
+        }
+
+        /* Accounts Grid */
+        .accounts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .account-card {
+            background: #fff;
+            border: 1px solid #e1e1e1;
+            border-radius: 8px;
+            padding: 15px;
+            transition: transform 0.2s;
+        }
+
+        .account-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .account-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .bank-name {
+            font-weight: bold;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        .account-balance {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #27ae60;
+        }
+
+        .account-balance.negative {
+            color: #c0392b;
+        }
+
+        .account-details {
+            font-size: 0.9em;
+            color: #555;
+            margin-top: 10px;
+        }
+
+        /* Transactions Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            color: #2c3e50;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .amount-positive {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .amount-negative {
+            color: #c0392b;
+            font-weight: bold;
+        }
+
+        #loading {
+            text-align: center;
+            font-size: 1.2em;
+            color: #666;
+            padding: 50px;
+        }
+
+        #error {
+            color: #c0392b;
+            text-align: center;
+            display: none;
+            padding: 20px;
+            background: #fdeaea;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Certomo Data Dashboard</h1>
+
+        <div id="loading">Loading data from Certomo...</div>
+        <div id="error"></div>
+
+        <div id="dashboard" style="display: none;">
+            <div class="section">
+                <h2>Accounts Summary</h2>
+                <div class="accounts-grid" id="accounts-container">
+                    <!-- Accounts will be inserted here -->
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Recent Transactions</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Currency</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactions-body">
+                        <!-- Transactions will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchData() {
+            try {
+                const response = await fetch('/api/certomo-data');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                const data = await response.json();
+                renderDashboard(data);
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                const errorDiv = document.getElementById('error');
+                errorDiv.style.display = 'block';
+                errorDiv.textContent = `Error: ${error.message}. Please check if the API Gateway is running.`;
+            }
+        }
+
+        function formatCurrency(amount, currency) {
+            return new Intl.NumberFormat('en-IL', { style: 'currency', currency: currency }).format(amount);
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString();
+        }
+
+        function renderDashboard(data) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+
+            // Render Accounts
+            const accountsContainer = document.getElementById('accounts-container');
+            accountsContainer.innerHTML = '';
+
+            if (data.accountsList) {
+                data.accountsList.forEach(account => {
+                    const card = document.createElement('div');
+                    card.className = 'account-card';
+                    
+                    const isNegative = account.amount < 0;
+                    const balanceClass = isNegative ? 'negative' : '';
+
+                    card.innerHTML = `
+                        <div class="account-header">
+                            <span class="bank-name">${account.bank || 'Unknown Bank'}</span>
+                        </div>
+                        <div class="account-balance ${balanceClass}">
+                            ${formatCurrency(account.amount, account.currency)}
+                        </div>
+                        <div class="account-details">
+                            <strong>${account.accountName || 'Unnamed Account'}</strong><br>
+                            <small>${account.accountNo || 'No Number'}</small>
+                        </div>
+                    `;
+                    accountsContainer.appendChild(card);
+                });
+            }
+
+            // Render Transactions (Limit to 20 for performance)
+            const transactionsBody = document.getElementById('transactions-body');
+            transactionsBody.innerHTML = '';
+
+            if (data.transactionList) {
+                // Sort by date descending if possible, though API might not guarantee order
+                const transactions = data.transactionList.slice(0, 50); 
+                
+                transactions.forEach(tx => {
+                    const row = document.createElement('tr');
+                    const isPositive = tx.amount > 0;
+                    const amountClass = isPositive ? 'amount-positive' : 'amount-negative';
+
+                    row.innerHTML = `
+                        <td>${formatDate(tx.valueDate)}</td>
+                        <td>${tx.description}</td>
+                        <td class="${amountClass}">${formatCurrency(tx.amount, tx.currency)}</td>
+                        <td>${tx.currency}</td>
+                    `;
+                    transactionsBody.appendChild(row);
+                });
+            }
+        }
+
+        // Initialize
+        fetchData();
+    </script>
+</body>
+</html>

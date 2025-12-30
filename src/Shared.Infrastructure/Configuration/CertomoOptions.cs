@@ -8,4 +8,7 @@ public class CertomoOptions
     public string ClientId { get; set; } = string.Empty;
     public string ClientSecret { get; set; } = string.Empty;
     public int TimeoutSeconds { get; set; } = 30;
+    
+    // Adding Secret property to match appsettings binding if needed, or we can map Secret to ClientSecret
+    public string Secret { get; set; } = string.Empty; 
 }
