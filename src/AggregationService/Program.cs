@@ -28,7 +28,8 @@ var host = builder.Build();
 using (var scope = host.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<OperationResilientDbContext>();
-    db.Database.Migrate();
+    // Use EnsureCreated() instead of Migrate() to support dev env without migration files
+    db.Database.EnsureCreated(); 
 }
 
 try
