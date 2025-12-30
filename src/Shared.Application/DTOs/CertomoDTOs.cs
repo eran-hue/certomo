@@ -39,28 +39,57 @@ public record CertomoAccount(
     [property: JsonPropertyName("parentId")] int? ParentId,
     [property: JsonPropertyName("account_no")] string AccountNo,
     [property: JsonPropertyName("accountName")] string AccountName,
+    [property: JsonPropertyName("accountBankUniqueId")] string AccountBankUniqueId,
     [property: JsonPropertyName("entityName")] string EntityName,
     [property: JsonPropertyName("currency")] string Currency,
     [property: JsonPropertyName("amount")] string Amount, // API returns string "55555551.27"
     [property: JsonPropertyName("bank")] string Bank,
     [property: JsonPropertyName("type")] string Type,
     [property: JsonPropertyName("bank_img")] string BankImg,
-    [property: JsonPropertyName("cfoAccessInfoId")] int CfoAccessInfoId
+    [property: JsonPropertyName("token_expiration_date")] string? TokenExpirationDate,
+    [property: JsonPropertyName("tokenExpiresIn")] string? TokenExpiresIn,
+    [property: JsonPropertyName("equityList")] object? EquityList, // Using object for complex/unknown structure
+    [property: JsonPropertyName("cfoAccessInfoId")] int CfoAccessInfoId,
+    [property: JsonPropertyName("otp")] bool? Otp,
+    [property: JsonPropertyName("loginType")] string? LoginType,
+    [property: JsonPropertyName("lastSuccessfullLoginTime")] string? LastSuccessfullLoginTime,
+    [property: JsonPropertyName("startDate")] string? StartDate,
+    [property: JsonPropertyName("endDate")] string? EndDate,
+    [property: JsonPropertyName("nextDate")] string? NextDate,
+    [property: JsonPropertyName("originalAmount")] string? OriginalAmount,
+    [property: JsonPropertyName("rate")] string? Rate
 );
 
 public record CertomoTransaction(
     [property: JsonPropertyName("active")] bool Active,
     [property: JsonPropertyName("id")] int? Id,
+    [property: JsonPropertyName("parentId")] int? ParentId,
     [property: JsonPropertyName("account_no")] string AccountNo,
     [property: JsonPropertyName("bank")] string Bank,
     [property: JsonPropertyName("type")] string Type,
     [property: JsonPropertyName("amount")] string Amount,
     [property: JsonPropertyName("currency")] string Currency,
+    [property: JsonPropertyName("balance_before")] string? BalanceBefore,
     [property: JsonPropertyName("balance")] string Balance,
+    [property: JsonPropertyName("date")] string Date,
+    [property: JsonPropertyName("bank_img")] string BankImg,
+    [property: JsonPropertyName("arrow")] string? Arrow,
     [property: JsonPropertyName("description")] string Description,
+    [property: JsonPropertyName("transCategory")] string? TransCategory,
+    [property: JsonPropertyName("categoryColor")] string? CategoryColor,
+    [property: JsonPropertyName("transClassification")] string? TransClassification,
+    [property: JsonPropertyName("classMatchingStrength")] string? ClassMatchingStrength,
+    [property: JsonPropertyName("isReport")] bool? IsReport,
+    [property: JsonPropertyName("cfoAccessInfoId")] int CfoAccessInfoId,
     [property: JsonPropertyName("valueDate")] string ValueDate,
+    [property: JsonPropertyName("obRaw")] string? ObRaw,
+    [property: JsonPropertyName("bookingStatus")] string? BookingStatus,
+    [property: JsonPropertyName("bankTransactionId")] string? BankTransactionId,
     [property: JsonPropertyName("reference")] string Reference,
-    [property: JsonPropertyName("entity")] string Entity
+    [property: JsonPropertyName("entity")] string Entity,
+    [property: JsonPropertyName("isDelta")] bool? IsDelta,
+    [property: JsonPropertyName("forcastList")] object? ForcastList, // Using object for complex/unknown structure
+    [property: JsonPropertyName("cfoName")] string? CfoName
 );
 
 // --- Israel Open Banking Auth ---
