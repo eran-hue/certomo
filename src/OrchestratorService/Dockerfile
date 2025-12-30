@@ -6,7 +6,9 @@ WORKDIR /app
 FROM mcr.microsoft.com/dotnet/sdk:10.0-preview AS build
 WORKDIR /src
 COPY ["src/OrchestratorService/OrchestratorService.csproj", "src/OrchestratorService/"]
-COPY ["src/Shared.Kernel/Shared.Kernel.csproj", "src/Shared.Kernel/"]
+COPY ["src/Shared.Application/Shared.Application.csproj", "src/Shared.Application/"]
+COPY ["src/Shared.Core/Shared.Core.csproj", "src/Shared.Core/"]
+COPY ["src/Shared.Infrastructure/Shared.Infrastructure.csproj", "src/Shared.Infrastructure/"]
 RUN dotnet restore "src/OrchestratorService/OrchestratorService.csproj"
 COPY . .
 WORKDIR "/src/src/OrchestratorService"
