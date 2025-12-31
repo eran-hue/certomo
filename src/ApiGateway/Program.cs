@@ -49,6 +49,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseDefaultFiles();
 app.UseStaticFiles(); // Serve static files (HTML/CSS/JS)
 
 app.UseSerilogRequestLogging();
