@@ -126,5 +126,15 @@ services:
       - RabbitMq__Username=guest
       - RabbitMq__Password=guest
 
+  ngrok:
+    image: ngrok/ngrok:latest
+    command: "http openbankapi:8080"
+    ports:
+      - "4040:4040"
+    environment:
+      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
+    depends_on:
+      - openbankapi
+
 volumes:
   postgres_data:
